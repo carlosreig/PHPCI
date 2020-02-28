@@ -35,6 +35,12 @@ switch($build->getStatus())
 		$subcls = 'danger';
 		$status = Lang::get('failed');
 	break;
+
+    case 4:
+        $cls = 'default';
+        $subcls = 'default';
+        $status = Lang::get('skipped');
+        break;
 }
 ?>
 <tr class="<?php print $cls; ?>">

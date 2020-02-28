@@ -108,7 +108,6 @@ class RunCommand extends Command
 
         while (count($buildsToProcess)) {
             $build = array_shift($buildsToProcess);
-            $build = BuildFactory::getBuild($build);
 
             // Skip build (for now) if there's already a build running in that project:
             if (!$this->isFromDaemon && in_array($build->getProjectId(), $running)) {

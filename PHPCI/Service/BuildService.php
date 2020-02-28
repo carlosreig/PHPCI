@@ -204,10 +204,10 @@ class BuildService
 
         $lastBuilds = [];
         foreach($buildsPerBranch as $builds) {
-            $sortedBuilds = krsort($builds);
+            krsort($builds);
 
-            $intermediateBuilds = array_slice($sortedBuilds, 1);
-            $lastBuild = array_slice($sortedBuilds,0 ,1);
+            $intermediateBuilds = array_slice($builds, 1);
+            $lastBuild = array_slice($builds,0 ,1);
 
             foreach($intermediateBuilds as $build) {
                 $build->setStatus(Build::STATUS_SKIPPED);
