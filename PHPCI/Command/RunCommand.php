@@ -96,6 +96,9 @@ class RunCommand extends Command
         $this->logger->addInfo(Lang::get('finding_builds'));
         $store = Factory::getStore('Build');
         $result = $store->getByStatus(0, $this->maxBuilds);
+
+        //CRM
+
         $this->logger->addInfo(Lang::get('found_n_builds', count($result['items'])));
 
         $builds = 0;
