@@ -186,41 +186,6 @@ class BuildStatusService
         }
         return 'Unknown';
     }
-
-    public function skipIntermediateBuilds(array $builds) {
-
-        $buildsPerBranch = [];
-        $store = Factory::getStore('Build');
-
-        foreach($builds as $build) {
-            $build = BuildFactory::getBuild($build);
-
-            if (!isset($buildsPerBranch[$build->getBranch()])) {
-                $buildsPerBranch[$build->getBranch()] = [];
-            }
-
-            $buildsPerBranch[$build->getBranch()][$build->getId()] = $build;
-        }
-
-        $lastBuilds = [];
-        foreach($buildsPerBranch as $builds) {
-            $sortedBuilds = krsort($builds);
-
-            $intermediateBuilds = array_slice($sortedBuilds, 1);
-            $lastBuild = array_slice($sortedBuilds,0 ,1);
-
-            foreach($intermediateBuilds as $build) {
-                $build->setStatus(Build::STATUS_SKIPPED);
-                $store->save($build);
-            }
-
-            $lastBuilds[] = $lastBuild;
-        }
-
-        return $lastBuilds;
-
-    }
-
     /**
      * @return string
      */
