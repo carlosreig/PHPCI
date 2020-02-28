@@ -214,7 +214,7 @@ class BuildService
                 $this->buildStore->save($build);
             }
 
-            $lastBuilds[] = $lastBuild;
+            $lastBuilds = array_merge($lastBuilds, $lastBuild);
         }
 
         return $lastBuilds;
