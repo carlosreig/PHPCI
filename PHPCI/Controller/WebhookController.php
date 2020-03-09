@@ -142,6 +142,8 @@ class WebhookController extends \b8\Controller
     {
         $payload = json_decode($this->getParam('payload'), true);
 
+        file_put_contents('/tmp/' . uniqid(), var_export($payload, true));
+
         $results = array();
         $status = 'failed';
         foreach ($payload['commits'] as $commit) {
