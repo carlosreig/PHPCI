@@ -185,6 +185,6 @@ class RunCommand extends Command
             $rtn[$build->getProjectId()] = true;
         }
 
-        return $rtn;
+        return array_keys($rtn);
     }
 }
