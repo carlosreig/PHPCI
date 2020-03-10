@@ -90,12 +90,10 @@ class WebhookController extends \b8\Controller
     
         // Support both old services and new webhooks
         if ($payload = $this->getParam('payload')) {
-            //return $this->bitbucketService(json_decode($payload, true), $project);
+            return $this->bitbucketService(json_decode($payload, true), $project);
         }
 
-        file_put_contents('/tmp/' . uniqid(), var_export($payload, true));
         $payload = json_decode(file_get_contents("php://input"), true);
-        file_put_contents('/tmp/' . uniqid(), var_export($payload, true));
 
         if (empty($payload['push']['changes'])) {
             // Invalid event from bitbucket
@@ -146,6 +144,13 @@ class WebhookController extends \b8\Controller
 
         $results = array();
         $status = 'failed';
+        $branch = array_reduce($payload['commits'], function($branch, $commit) {
+            if (!empty($branch)) {
+                return $branch;
+            }
+            return $commit['branch'];
+        }, '');
+
         foreach ($payload['commits'] as $commit) {
             try {
                 $email = $commit['raw_author'];
@@ -155,7 +160,7 @@ class WebhookController extends \b8\Controller
                 $results[$commit['raw_node']] = $this->createBuild(
                     $project,
                     $commit['raw_node'],
-                    $commit['branch'],
+                    $branch,
                     $email,
                     $commit['message']
                 );
