@@ -10,6 +10,7 @@
 namespace PHPCI\Service;
 
 use b8\Config;
+use b8\Store\Factory;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
 use PHPCI\BuildFactory;
@@ -185,5 +186,37 @@ class BuildService
                 $this->queueError = true;
             }
         }
+    }
+
+    public function skipIntermediateBuilds(array $builds) {
+
+        $buildsPerBranch = [];
+
+        foreach($builds as $build) {
+            $build = BuildFactory::getBuild($build);
+
+            if (!isset($buildsPerBranch[$build->getBranch()])) {
+                $buildsPerBranch[$build->getBranch()] = [];
+            }
+
+            $buildsPerBranch[$build->getBranch()][$build->getId()] = $build;
+        }
+
+        $lastBuilds = [];
+        foreach($buildsPerBranch as $builds) {
+            krsort($builds);
+
+            $intermediateBuilds = array_slice($builds, 1);
+            $lastBuild = array_slice($builds,0 ,1);
+
+            foreach($intermediateBuilds as $build) {
+                $build->setStatus(Build::STATUS_SKIPPED);
+                $this->buildStore->save($build);
+            }
+
+            $lastBuilds = array_merge($lastBuilds, $lastBuild);
+        }
+
+        return $lastBuilds;
     }
 }

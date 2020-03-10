@@ -144,6 +144,13 @@ class WebhookController extends \b8\Controller
 
         $results = array();
         $status = 'failed';
+        $branch = array_reduce($payload['commits'], function($branch, $commit) {
+            if (!empty($branch)) {
+                return $branch;
+            }
+            return $commit['branch'];
+        }, '');
+
         foreach ($payload['commits'] as $commit) {
             try {
                 $email = $commit['raw_author'];
@@ -153,7 +160,7 @@ class WebhookController extends \b8\Controller
                 $results[$commit['raw_node']] = $this->createBuild(
                     $project,
                     $commit['raw_node'],
-                    $commit['branch'],
+                    $branch,
                     $email,
                     $commit['message']
                 );

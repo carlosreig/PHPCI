@@ -9,6 +9,8 @@
 
 namespace PHPCI\Service;
 
+use b8\Store\Factory;
+use PHPCI\BuildFactory;
 use PHPCI\Model\Project;
 use PHPCI\Model\Build;
 
@@ -179,10 +181,11 @@ class BuildStatusService
                 return 'Success';
             case Build::STATUS_FAILED:
                 return 'Failure';
+            case Build::STATUS_SKIPPED:
+                return 'Skipped';
         }
         return 'Unknown';
     }
-
     /**
      * @return string
      */

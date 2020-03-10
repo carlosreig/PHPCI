@@ -15,6 +15,7 @@ use PHPCI\Helper\Lang;
 use PHPCI\Logging\BuildDBLogHandler;
 use PHPCI\Logging\LoggedBuildContextTidier;
 use PHPCI\Logging\OutputLogHandler;
+use PHPCI\Service\BuildService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -96,13 +97,17 @@ class RunCommand extends Command
         $this->logger->addInfo(Lang::get('finding_builds'));
         $store = Factory::getStore('Build');
         $result = $store->getByStatus(0, $this->maxBuilds);
+
+        $buildService = new BuildService($store);
+
+        $buildsToProcess = $buildService->skipIntermediateBuilds($result['items']);
+
         $this->logger->addInfo(Lang::get('found_n_builds', count($result['items'])));
 
         $builds = 0;
 
-        while (count($result['items'])) {
-            $build = array_shift($result['items']);
-            $build = BuildFactory::getBuild($build);
+        while (count($buildsToProcess)) {
+            $build = array_shift($buildsToProcess);
 
             // Skip build (for now) if there's already a build running in that project:
             if (!$this->isFromDaemon && in_array($build->getProjectId(), $running)) {
@@ -180,6 +185,6 @@ class RunCommand extends Command
             $rtn[$build->getProjectId()] = true;
         }
 
-        return $rtn;
+        return array_keys($rtn);
     }
 }
